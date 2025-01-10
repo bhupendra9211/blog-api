@@ -60,9 +60,9 @@ class UsersController extends Controller
                 'message' => 'The provided credentials are incorrect.',
             );
             return response()->json($result, 401);
+        }else{
+            $result = array('status' => true, 'message' => 'User Login Sucessfully', 'data' => $user);
+            return response()->json($result, 200); 
         }
-        return [
-            'user' => $user
-        ];
     }
 }
