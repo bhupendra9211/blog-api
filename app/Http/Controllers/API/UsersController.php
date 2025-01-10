@@ -32,8 +32,7 @@ class UsersController extends Controller
             ]
         );
         if ($user->id) {
-            $token = $user->createToken($request->username);
-            $result = array('status' => true, 'message' => 'User created Sucessfully', 'data' => $user,'token' => $token->plainTextToken);
+            $result = array('status' => true, 'message' => 'User created Sucessfully', 'data' => $user);
             return response()->json($result, 200); 
         } else {
             $result = array('status' => false, 'message' => 'Sometings went wrong ! ');
