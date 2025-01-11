@@ -10,9 +10,7 @@ use App\Http\Controllers\API\CommentController;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::get('/',function(){
-    return "api integrated";
-});
+// Route::get('/',[UsersController::class,'test']);
 Route::post('users/register',[UsersController::class,'userRegistration']);
 Route::post('users/login',[UsersController::class,'userLogin']);
 

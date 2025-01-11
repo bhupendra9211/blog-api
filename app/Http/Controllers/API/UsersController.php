@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
 {
+    // public function test(){
+    //     $result = array('status' => true, 'message' => 'User created Sucessfully');
+    //     return response()->json($result, 200); 
+    // }
     public function userRegistration(Request $request){
         $validator = Validator::make($request->all(), [
             'username' => 'required|string',
