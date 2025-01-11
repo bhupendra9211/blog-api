@@ -19,9 +19,16 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('user')->latest()->get();
-        $result = array('status' => true, 'message' => 'Post listed Sucessfully', 'data' => $posts);
-        return response()->json($result, 200); 
+        try {
+            $posts = Post::with('user')->latest()->get();
+            $result = array('status' => true, 'message' => 'Post listed Sucessfully', 'data' => $posts);
+            return response()->json($result, 200); 
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while listing the post.',
+            ], 500);
+        }
     }
 
     /**
@@ -29,22 +36,31 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png',
-        ]);
+        try {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'content' => 'required',
+                'image' => 'nullable|image|mimes:jpeg,png',
+            ]);
+    
+            $data = $request->only(['title', 'content']);
+            $data['user_id'] = $request->user()->id;
+    
+            if ($request->hasFile('image')) {
+                $data['image_path'] = $request->file('image')->store('images', 'public');
+            }
+    
+            $post = Post::create($data);
+            $result = array('status' => true, 'message' => 'Post Created Sucessfully', 'data' => $post);
+            return response()->json($result, 201); 
 
-        $data = $request->only(['title', 'content']);
-        $data['user_id'] = $request->user()->id;
-
-        if ($request->hasFile('image')) {
-            $data['image_path'] = $request->file('image')->store('images', 'public');
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while creating the post.',
+            ], 500);
         }
-
-        $post = Post::create($data);
-        $result = array('status' => true, 'message' => 'Post Created Sucessfully', 'data' => $post);
-        return response()->json($result, 201); 
+    
     }
 
     /**
@@ -52,7 +68,15 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return response()->json($post->load('user', 'comments'), 200);
+        try {
+            return response()->json($post->load('user', 'comments'), 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while displaying the post.',
+            ], 500);
+        }
+    
     }
 
 
@@ -62,21 +86,30 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $this->authorize('update', $post);
+        try {
+            $request->validate([
+                'title' => 'string|max:255',
+                'content' => 'string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg',
+            ]);
+    
+            if ($request->hasFile('image')) {
+                Storage::disk('public')->delete($post->image_path);
+                $post->image_path = $request->file('image')->store('images', 'public');
+            }
+    
+            $post->update($request->only(['title', 'content']));
+            $result = array('status' => true, 'message' => 'Post Updated Sucessfully', 'data' => $post);
+            return response()->json($result, 200); 
 
-        $request->validate([
-            'title' => 'string|max:255',
-            'content' => 'string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg',
-        ]);
-
-        if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($post->image_path);
-            $post->image_path = $request->file('image')->store('images', 'public');
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while updating the post.',
+            ], 500);
         }
+    
 
-        $post->update($request->only(['title', 'content']));
-        $result = array('status' => true, 'message' => 'Post Updated Sucessfully', 'data' => $post);
-        return response()->json($result, 200); 
 
     }
 
@@ -86,56 +119,75 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $this->authorize('delete', $post);
-
-        if ($post->image_path) {
-            Storage::disk('public')->delete($post->image_path);
+        try {    
+            if ($post->image_path) {
+                Storage::disk('public')->delete($post->image_path);
+            }
+    
+            $post->delete();
+    
+            $result = array('status' => true, 'message' => 'Post Deleted Sucessfully');
+            return response()->json($result, 204); 
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while deleting the post.',
+            ], 500);
         }
-
-        $post->delete();
-
-        $result = array('status' => true, 'message' => 'Post Deleted Sucessfully');
-        return response()->json($result, 204); 
-        return response()->json(null, 204);
     }
 
     public function uploadImage(Request $request, Post $post)
-{
-    $this->authorize('update', $post);
+    {
+        $this->authorize('update', $post);
+        try {
+            $request->validate([
+                'image' => 'required|image|mimes:jpeg,png|max:2048', 
+            ]);
+        
+            $path = $request->file('image')->store('post-images', 'public');
+        
+            $post->update(['image_path' => $path]);
+        
+            return response()->json([
+                'status' => true,
+                'message' => 'Image uploaded successfully.',
+                'data' => $post,
+            ], 200);
 
-    $request->validate([
-        'image' => 'required|image|mimes:jpeg,png|max:2048', 
-    ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while uploading the image.',
+            ], 500);
+        }
 
-    $path = $request->file('image')->store('post-images', 'public');
-
-    $post->update(['image_path' => $path]);
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Image uploaded successfully.',
-        'data' => $post,
-    ], 200);
-}
-public function deleteImage(Post $post)
-{
-    $this->authorize('update', $post);
-
-    if ($post->image_path) {
-        Storage::disk('public')->delete($post->image_path);
-
-        $post->update(['image_path' => null]);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Image deleted successfully.',
-        ], 200);
     }
-
-    return response()->json([
-        'status' => false,
-        'message' => 'No image to delete.',
-    ], 404);
-}
+public function deleteImage(Post $post)
+    {
+        $this->authorize('update', $post);
+        try {
+            if ($post->image_path) {
+                Storage::disk('public')->delete($post->image_path);
+    
+                $post->update(['image_path' => null]);
+    
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Image deleted successfully.',
+                ], 200);
+            }
+    
+            return response()->json([
+                'status' => false,
+                'message' => 'No image to delete.',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while deleting the image.',
+            ], 500);
+        }
+    }
 
 
 }
