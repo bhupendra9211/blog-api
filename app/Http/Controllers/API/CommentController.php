@@ -15,44 +15,74 @@ class CommentController extends Controller
 
     public function index(Post $post)
     {
-        return response()->json($post->comments()->with('user')->get(), 200);
+        try {
+            return response()->json($post->comments()->with('user')->get(), 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while listing the comments.',
+            ], 500);
+        }
     }
 
     public function store(Request $request, Post $post)
     {
-        $request->validate(['content' => 'required|string']);
+        try {
+            $request->validate(['content' => 'required|string']);
 
-        $comment = $post->comments()->create([
-            'content' => $request->content,
-            'user_id' => $request->user()->id,
-        ]);
+            $comment = $post->comments()->create([
+                'content' => $request->content,
+                'user_id' => $request->user()->id,
+            ]);
 
-        return response()->json($comment, 201);
+            return response()->json($comment, 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while creating the comments.',
+            ], 500);
+        }
     }
 
     public function show(Comment $comment)
     {
-        return response()->json($comment->load('user'), 200);
+        try {
+            return response()->json($comment->load('user'), 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while displayiny the comments.',
+            ], 500);
+        }
     }
 
     public function update(Request $request, Comment $comment)
     {
         $this->authorize('update', $comment);
-
-        $request->validate(['content' => 'required|string']);
-
-        $comment->update(['content' => $request->content]);
-
-        return response()->json($comment, 200);
+        try {
+            $request->validate(['content' => 'required|string']);
+            $comment->update(['content' => $request->content]);
+            return response()->json($comment, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while updating the comment.',
+            ], 500);
+        }
     }
 
     public function destroy(Comment $comment)
     {
         $this->authorize('delete', $comment);
-
-        $comment->delete();
-
-        return response()->json(null, 204);
+        try {
+            $comment->delete();
+            return response()->json(null, 204);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An API failed while deleting the comment.',
+            ], 500);
+        }
     }
 }
 
