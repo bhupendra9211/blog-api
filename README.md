@@ -1,66 +1,245 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Blog API Project
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A robust and scalable Blog API built with Laravel, designed to handle user authentication, blog post management, comments, image uploads, and error handling. The project follows a feature-driven development workflow, ensuring modular and organized development.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Table of Contents
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Development Workflow](#development-workflow)
+- [Branches and Pull Requests](#branches-and-pull-requests)
+- [Installation](#installation)
+- [API Documentation](#api-documentation)
+- [Testing](#testing)
+- [Exception Handling](#exception-handling)
+- [Thank You](#thank-you)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Project Overview
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+This project demonstrates the implementation of a Laravel application for blogging. It includes features like user authentication, blog posts, comments, and token-based API authentication.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Features
 
-## Laravel Sponsors
+- **Authentication**: Secure user registration and login with token-based authentication.
+- **Blog Posts**: Create, update, delete, and view blog posts.
+- **Comments**: Add and manage comments on blog posts.
+- **Image Upload**: Attach images to blog posts with validation.
+- **Role Management**: Super admin management for enhanced control.
+- **Exception Handling**: Comprehensive error handling for better debugging.
+- **Testing**: PHPUnit tests for Post Comment validation.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## Development Workflow
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Branching Strategy
 
-## Contributing
+1. **Branches**:
+   - `main`: Production-ready branch.
+   - `develop`: Staging branch for integrating all features.
+   - Feature branches derived from `develop` for each task.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. **Feature Workflow**:
+   - Each feature was implemented in its respective branch.
+   - Upon completion, a Pull Request (PR) was made to merge changes into the `develop` branch.
+   - Once all features were completed and reviewed, `develop` was merged into `main`.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Installation
 
-## Security Vulnerabilities
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/bhupendra9211/blog-api.git
+   cd blog-api
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+2. Install dependencies:
+   ```bash
+   composer install
+   npm install
+   ```
 
-## License
+3. Configure the environment:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+4. Set up the database:
+   ```bash
+   php artisan migrate --seed
+   ```
+
+5. Start the application:
+   ```bash
+   php artisan serve
+   ```
+
+---
+
+## API Documentation
+
+### Public Endpoints
+#### User Authentication
+1. **Register a User**
+   - **POST** `/api/users/register`
+   - **Payload**:
+     ```json
+     {
+         "username": "testuser",
+         "email": "testuser@example.com",
+         "password": "password123",
+         "password_confirmation": "password123"
+     }
+     ```
+   - **Response**: User created with a success message.
+
+2. **Login a User**
+   - **POST** `/api/users/login`
+   - **Payload**:
+     ```json
+     {
+         "email": "testuser@example.com",
+         "password": "password123"
+     }
+     ```
+   - **Response**: User details with an authentication token.
+
+---
+
+### Protected Endpoints (Require Token)
+#### Blog Posts
+1. **Fetch All Posts**
+   - **GET** `/api/posts`
+   - **Response**: List of all posts with associated comments.
+
+2. **Create a New Post**
+   - **POST** `/api/posts`
+   - **Payload**:
+     ```json
+     {
+         "title": "My First Blog Post",
+         "content": "This is the content of the blog post."
+     }
+     ```
+   - **Response**: Details of the created post.
+
+3. **Fetch a Single Post**
+   - **GET** `/api/posts/{post}`
+   - **Response**: Details of the specific post with comments.
+
+4. **Update a Post**
+   - **PUT** `/api/posts/{post}`
+   - **Payload**:
+     ```json
+     {
+         "title": "Updated Title",
+         "content": "Updated content."
+     }
+     ```
+   - **Response**: Updated post details.
+
+5. **Delete a Post**
+   - **DELETE** `/api/posts/{post}`
+   - **Response**: Success message.
+
+6. **Upload an Image to a Post**
+   - **POST** `/api/posts/{post}/images`
+   - **Payload**: Multipart form-data with the image file.
+   - **Response**: Success message with updated post details.
+
+7. **Delete an Image from a Post**
+   - **DELETE** `/api/posts/{post}/images`
+   - **Response**: Success message.
+
+---
+
+#### Comments
+1. **Fetch All Comments for a Post**
+   - **GET** `/api/posts/{post}/comments`
+   - **Response**: List of all comments for the post.
+
+2. **Add a Comment to a Post**
+   - **POST** `/api/posts/{post}/comments`
+   - **Payload**:
+     ```json
+     {
+         "content": "This is a comment."
+     }
+     ```
+   - **Response**: Details of the created comment.
+
+3. **Update a Comment**
+   - **PUT** `/api/comments/{comment}`
+   - **Payload**:
+     ```json
+     {
+         "content": "Updated comment content."
+     }
+     ```
+   - **Response**: Updated comment details.
+
+4. **Delete a Comment**
+   - **DELETE** `/api/comments/{comment}`
+   - **Response**: Success message.
+
+---
+
+## Testing
+
+Run the tests using PHPUnit:
+```bash
+php artisan test
+```
+
+### Types of Tests
+
+- **Feature Tests**: Test the end-to-end functionality of API routes and validation.
+
+**Example Test Command**:
+```bash
+php artisan test
+```
+
+Evidence: All tests pass successfully.
+
+---
+
+## Exception Handling
+
+### Purpose
+Exception handling ensures:
+- Errors are logged for debugging.
+- Clients receive clear and user-friendly error messages.
+
+### Implementation
+- **Validation Errors**: Automatically handled and returned as structured JSON responses.
+
+**Example Error Response**:
+```json
+{
+    "status": false,
+    "message": "Validation Error",
+    "errors": {
+        "title": ["The title field is required."]
+    }
+}
+```
+
+---
+
+## Thank You 
+### Contact Details
+- Name : Bhupendra Kumar Sah
+- Gmail : shahbhupendra@9211@gmail.com
+- Number : 9801620807
+- Portfolio : ```https://bhupendrasah.com.np/```
+
+---
