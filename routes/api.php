@@ -16,6 +16,8 @@ Route::post('users/login',[UsersController::class,'userLogin']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('users/profile', [UsersController::class, 'getProfile']);
+    Route::patch('users/profile', [UsersController::class, 'updateProfile']);
     Route::get('posts', [PostController::class, 'index']);
     Route::post('posts', [PostController::class, 'store']);
     Route::get('posts/{post}', [PostController::class, 'show']);
